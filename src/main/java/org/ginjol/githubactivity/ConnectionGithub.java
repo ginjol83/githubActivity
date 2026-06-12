@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class ConnectionGithub {
     private String userName;
@@ -29,7 +30,7 @@ public class ConnectionGithub {
         this.userName = userName;
     }
 
-    public GitHubData connect(){
+    public ArrayList<GitHubData> connect(){
 
         try {
             // 1. Url define
@@ -74,52 +75,61 @@ public class ConnectionGithub {
         return null;
     }
 
-    public GitHubData toJson(String jsonText){
+    public ArrayList<GitHubData> toJson(String jsonText){
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode node = mapper.readTree(jsonText);
 
+            ArrayList<GitHubData> gitHubDataList = new ArrayList<>();
             // Extract value
-            JsonNode nodeList   = node.get(0);
+            for(JsonNode nodeList: node){
+                //JsonNode nodeList   = node.get(0);
 
-            String   id         = nodeList.get("id").asText();
-            String   type       = nodeList.get("type").asText();
-            boolean  isPublic   = nodeList.get("public").asBoolean();
-            String   createdAt  = nodeList.get("created_at").asText();
+                String   id         = nodeList.path("id").asText();
+                String   type       = nodeList.path("type").asText();
+                boolean  isPublic   = nodeList.path("public").asBoolean();
+                String   createdAt  = nodeList.path("created_at").asText();
+                GitHubData gitHubData = new GitHubData();
+                gitHubData.setCreatedAt(createdAt);
 
-            JsonNode payloadNode          = nodeList.get("payload");
-            String   payloadRef           = payloadNode.get("ref").asText();
-            String   payloadHead          = payloadNode.get("head").asText();
-            String   payloadPushId        = payloadNode.get("push_id").asText();
-            String   payloadRepositoryId  = payloadNode.get("repository_id").asText();
-            Payload  payload              = new Payload(payloadRepositoryId,payloadPushId,payloadRef,payloadHead);
+                JsonNode payloadNode          = nodeList.path("payload");
+                if(!payloadNode.isNull()){
+                    String   payloadRef           = payloadNode.path("ref").asText();
+                    String   payloadHead          = payloadNode.path("head").asText();
+                    String   payloadPushId        = payloadNode.path("push_id").asText();
+                    String   payloadRepositoryId  = payloadNode.path("repository_id").asText();
+                    Payload  payload              = new Payload(payloadRepositoryId,payloadPushId,payloadRef,payloadHead);
+                    gitHubData.setPayload(payload);
+                }
 
 
-            JsonNode actorNode         = nodeList.get("actor");
-            String   actorId           = actorNode.get("id").asText();
-            String   actorUrl          = actorNode.get("url").asText();
-            String   actorLogin        = actorNode.get("login").asText();
-            String   actorAvatarUrl    = actorNode.get("avatar_url").asText();
-            String   actorGravatarId   = actorNode.get("gravatar_id").asText();
-            String   actorDisplayLogin = actorNode.get("display_login").asText();
-            Actor    actor             = new Actor(actorId,actorLogin,actorDisplayLogin,actorGravatarId,actorUrl,actorAvatarUrl);
+                JsonNode actorNode         = nodeList.path("actor");
+                String   actorId           = actorNode.path("id").asText();
+                String   actorUrl          = actorNode.path("url").asText();
+                String   actorLogin        = actorNode.path("login").asText();
+                String   actorAvatarUrl    = actorNode.path("avatar_url").asText();
+                String   actorGravatarId   = actorNode.path("gravatar_id").asText();
+                String   actorDisplayLogin = actorNode.path("display_login").asText();
+                Actor    actor             = new Actor(actorId,actorLogin,actorDisplayLogin,actorGravatarId,actorUrl,actorAvatarUrl);
 
-            JsonNode repoNode   = nodeList.get("repo");
-            String   repoId     = repoNode.get("id").asText();
-            String   repoUrl    = repoNode.get("url").asText();
-            String   repoName   = repoNode.get("name").asText();
-            Repo     repo       = new Repo(repoId,repoName,repoUrl);
+                JsonNode repoNode   = nodeList.path("repo");
+                String   repoId     = repoNode.path("id").asText();
+                String   repoUrl    = repoNode.path("url").asText();
+                String   repoName   = repoNode.path("name").asText();
+                Repo     repo       = new Repo(repoId,repoName,repoUrl);
 
-            GitHubData gitHubData = new GitHubData();
-            gitHubData.setCreatedAt(createdAt);
-            gitHubData.setPayload(payload);
-            gitHubData.setPublic(isPublic);
-            gitHubData.setActor(actor);
-            gitHubData.setRepo(repo);
-            gitHubData.setType(type);
-            gitHubData.setId(id);
 
-            return gitHubData;
+
+                gitHubData.setPublic(isPublic);
+                gitHubData.setActor(actor);
+                gitHubData.setRepo(repo);
+                gitHubData.setType(type);
+                gitHubData.setId(id);
+
+                gitHubDataList.add(gitHubData);
+            }
+
+            return gitHubDataList;
         }catch (JsonProcessingException e){
 
         }

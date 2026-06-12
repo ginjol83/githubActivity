@@ -111,3 +111,17 @@ Si aparece `invalid target release: 24`, instala JDK 24 o ajusta temporalmente `
 
 - Challenge: https://roadmap.sh/projects/github-user-activity
 
+pendiente : 
+
+Muestra la actividad obtenida en la terminal.
+
+JavaScript
+
+Output:
+- Pushed 3 commits to kamranahmedse/developer-roadmap
+- Opened a new issue in kamranahmedse/developer-roadmap
+- Starred kamranahmedse/developer-roadmap
+
+Gestionar los errores de forma adecuada, como nombres de usuario no válidos o fallos en la API.
+
+

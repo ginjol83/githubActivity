@@ -10,7 +10,7 @@ public class ConnectionGithubTest {
     public void testConnectToGithub() {
         String userName = "ginjol83";
         ConnectionGithub connection = new ConnectionGithub(userName);
-        assertEquals(userName, connection.connect().getActor().getLogin());
+        assertEquals(userName, connection.connect().get(0).getActor().getLogin());
     }
 
 }
